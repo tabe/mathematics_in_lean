@@ -108,8 +108,23 @@ example {x y : ℝ} (h : x ≤ y) : ¬y ≤ x ↔ x ≠ y := by
 example {x y : ℝ} (h : x ≤ y) : ¬y ≤ x ↔ x ≠ y :=
   ⟨fun h₀ h₁ ↦ h₀ (by rw [h₁]), fun h₀ h₁ ↦ h₀ (le_antisymm h h₁)⟩
 
+example {x y : ℝ} : x ≤ y ∧ ¬y ≤ x ↔ x ≤ y ∧ x ≠ y := by
+  constructor
+  · rintro ⟨h₀, h₁⟩
+    contrapose! h₁
+    apply le_of_eq
+    apply Eq.symm
+    apply h₁
+    exact h₀
+  · rintro ⟨h₀, h₁⟩
+    constructor
+    · exact h₀
+    · contrapose! h₁
+      apply le_antisymm h₀ h₁
+
 example {x y : ℝ} : x ≤ y ∧ ¬y ≤ x ↔ x ≤ y ∧ x ≠ y :=
-  sorry
+  ⟨fun ⟨h₀, h₁⟩ ↦ ⟨h₀, fun h' ↦ h₁ (le_of_eq (Eq.symm h'))⟩,
+   fun ⟨h₀, h₁⟩ ↦ ⟨h₀, fun h' ↦ h₁ (le_antisymm h₀ h')⟩⟩
 
 theorem aux {x y : ℝ} (h : x ^ 2 + y ^ 2 = 0) : x = 0 :=
   have h' : x ^ 2 = 0 := by sorry
