@@ -48,7 +48,15 @@ example : s ∩ (t ∪ u) ⊆ s ∩ t ∪ s ∩ u := by
   . right; exact ⟨xs, xu⟩
 
 example : s ∩ t ∪ s ∩ u ⊆ s ∩ (t ∪ u) := by
-  sorry
+  rintro x hx
+  rcases hx with ⟨hs, ht⟩ | ⟨hs, hu⟩
+  . constructor
+    . exact hs
+    . left; exact ht
+  . constructor
+    . exact hs
+    . right; exact hu
+
 example : (s \ t) \ u ⊆ s \ (t ∪ u) := by
   intro x xstu
   have xs : x ∈ s := xstu.1.1
@@ -68,7 +76,15 @@ example : (s \ t) \ u ⊆ s \ (t ∪ u) := by
   rintro (xt | xu) <;> contradiction
 
 example : s \ (t ∪ u) ⊆ (s \ t) \ u := by
-  sorry
+  rintro x ⟨xs, xtu⟩
+  constructor
+  . constructor
+    . exact xs
+    . contrapose! xtu
+      left; exact xtu
+  . contrapose! xtu
+    right; exact xtu
+
 example : s ∩ t = t ∩ s := by
   ext x
   simp only [mem_inter_iff]
@@ -87,15 +103,34 @@ example : s ∩ t = t ∩ s := by
   . rintro x ⟨xt, xs⟩; exact ⟨xs, xt⟩
 
 example : s ∩ t = t ∩ s :=
-    Subset.antisymm sorry sorry
+    Subset.antisymm (fun _ ⟨xs, xt⟩ ↦ ⟨xt, xs⟩) (fun _ ⟨xt, xs⟩ ↦ ⟨xs, xt⟩)
+
 example : s ∩ (s ∪ t) = s := by
-  sorry
+  ext x
+  constructor
+  . rintro ⟨xs, _⟩; exact xs
+  . intro xs
+    constructor
+    . exact xs
+    . left; exact xs
 
 example : s ∪ s ∩ t = s := by
-  sorry
+  ext x
+  constructor
+  . rintro (xs | ⟨xs, _⟩)
+    . exact xs
+    . exact xs
+  . intro xs
+    left; exact xs
 
 example : s \ t ∪ t = s ∪ t := by
-  sorry
+  apply Subset.antisymm
+  . rintro x (⟨xs, _⟩ | xt)
+    . left; exact xs
+    . right; exact xt
+  . rintro x (xs | xt)
+    . simp; left; exact xs
+    . simp; right; exact xt
 
 example : s \ t ∪ t \ s = (s ∪ t) \ (s ∩ t) := by
   sorry
