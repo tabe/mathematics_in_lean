@@ -133,7 +133,24 @@ example : s \ t ∪ t = s ∪ t := by
     . simp; right; exact xt
 
 example : s \ t ∪ t \ s = (s ∪ t) \ (s ∩ t) := by
-  sorry
+  apply Subset.antisymm
+  · rintro x (⟨xs, xnt⟩ | ⟨xt, xns⟩)
+    · constructor
+      · left; exact xs
+      · contrapose! xnt
+        exact xnt.right
+    · constructor
+      · right; exact xt
+      · contrapose! xns
+        exact xns.left
+  · rintro x ⟨xu, xi⟩
+    rcases xu with xs | xt
+    · left; constructor
+      · exact xs
+      · intro xt; apply xi; exact ⟨xs, xt⟩
+    · right; constructor
+      · exact xt
+      · intro xs; apply xi; exact ⟨xs, xt⟩
 
 def evens : Set ℕ :=
   { n | Even n }
@@ -154,7 +171,13 @@ example (x : ℕ) : x ∈ (univ : Set ℕ) :=
   trivial
 
 example : { n | Nat.Prime n } ∩ { n | n > 2 } ⊆ { n | ¬Even n } := by
-  sorry
+  rintro n ⟨hp, h3⟩
+  simp at hp
+  simp at h3
+  simp
+  rcases Nat.Prime.eq_two_or_odd hp with h2 | ho
+  · rw [h2] at h3; contradiction
+  · intro he; rw [Nat.even_iff] at he; rw [he] at ho; contradiction
 
 #print Prime
 
@@ -190,10 +213,14 @@ section
 variable (ssubt : s ⊆ t)
 
 example (h₀ : ∀ x ∈ t, ¬Even x) (h₁ : ∀ x ∈ t, Prime x) : ∀ x ∈ s, ¬Even x ∧ Prime x := by
-  sorry
+  rintro x xs
+  have : x ∈ t := ssubt xs
+  exact ⟨h₀ x this, h₁ x this⟩
 
 example (h : ∃ x ∈ s, ¬Even x ∧ Prime x) : ∃ x ∈ t, Prime x := by
-  sorry
+  rcases h with ⟨x, xs, _, h⟩
+  have : x ∈ t := ssubt xs
+  use x
 
 end
 
