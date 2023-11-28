@@ -34,7 +34,17 @@ example : s ⊆ f ⁻¹' (f '' s) := by
   use x, xs
 
 example : f '' s ⊆ v ↔ s ⊆ f ⁻¹' v := by
-  sorry
+  constructor
+  · intro h x xs
+    simp
+    apply h
+    apply mem_image_of_mem
+    exact xs
+  intro h y ⟨x, xs, fxy⟩
+  rw [← fxy]
+  apply mem_preimage.mp
+  apply h
+  exact xs
 
 example (h : Injective f) : f ⁻¹' (f '' s) ⊆ s := by
   sorry
