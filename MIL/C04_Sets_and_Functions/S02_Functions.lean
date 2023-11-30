@@ -223,11 +223,26 @@ variable (f : α → β)
 
 open Function
 
-example : Injective f ↔ LeftInverse (inverse f) f :=
-  sorry
+#print LeftInverse
+#print RightInverse
 
-example : Surjective f ↔ RightInverse (inverse f) f :=
-  sorry
+example : Injective f ↔ LeftInverse (inverse f) f := by
+  constructor
+  · intro injf x
+    apply injf
+    apply inverse_spec
+    use x
+  intro g x y fxeq
+  rw [← g x, ← g y]
+  congr
+
+example : Surjective f ↔ RightInverse (inverse f) f := by
+  constructor
+  · intro surjf y
+    nth_rw 2 [← inverse_spec y (surjf y)]
+  intro g y
+  use (inverse f) y
+  apply g
 
 end
 
@@ -243,10 +258,10 @@ theorem Cantor : ∀ f : α → Set α, ¬Surjective f := by
     intro h'
     have : j ∉ f j := by rwa [h] at h'
     contradiction
-  have h₂ : j ∈ S
-  sorry
-  have h₃ : j ∉ S
-  sorry
+  have h₂ : j ∈ S := h₁
+  have h₃ : j ∉ S := by
+    rw [← h]
+    exact h₁
   contradiction
 
 -- COMMENTS: TODO: improve this
