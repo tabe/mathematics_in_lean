@@ -47,10 +47,18 @@ example : f '' s ⊆ v ↔ s ⊆ f ⁻¹' v := by
   exact xs
 
 example (h : Injective f) : f ⁻¹' (f '' s) ⊆ s := by
-  sorry
+  intro x hx
+  rcases mem_preimage.mp hx with ⟨x₁, ⟨x₁s, fx₁fx⟩⟩
+  have g : x₁ = x := h fx₁fx
+  rw [← g]
+  exact x₁s
 
 example : f '' (f ⁻¹' u) ⊆ u := by
-  sorry
+  intro x hx
+  have h : ∃ y ∈ f ⁻¹' u, f y = x := (mem_image f (f ⁻¹' u) x).mp hx
+  rcases h with ⟨y, ⟨hy, fyx⟩⟩
+  rw [← fyx]
+  exact mem_preimage.mp hy
 
 example (h : Surjective f) : u ⊆ f '' (f ⁻¹' u) := by
   sorry
@@ -153,16 +161,38 @@ example : range exp = { y | y > 0 } := by
   rw [exp_log ypos]
 
 example : InjOn sqrt { x | x ≥ 0 } := by
-  sorry
+  intro x hx x₁ hx₁ sxeq
+  apply (sqrt_inj hx hx₁).mp
+  exact sxeq
 
 example : InjOn (fun x ↦ x ^ 2) { x : ℝ | x ≥ 0 } := by
-  sorry
+  intro x hx x₁ hx₁
+  dsimp
+  intro x2eq; calc
+  x = sqrt (x ^ 2) := by rw [sqrt_sq hx]
+  _ = sqrt (x₁ ^ 2) := by rw [x2eq]
+  _ = x₁ := by rw [sqrt_sq hx₁]
 
 example : sqrt '' { x | x ≥ 0 } = { y | y ≥ 0 } := by
-  sorry
+  ext y; constructor
+  · intro h
+    rcases h with ⟨x, _, rfl⟩
+    apply sqrt_nonneg
+  intro ypos
+  use y * y
+  constructor
+  · exact mul_self_nonneg y
+  exact sqrt_mul_self ypos
 
 example : (range fun x ↦ x ^ 2) = { y : ℝ | y ≥ 0 } := by
-  sorry
+  ext y; constructor
+  · rintro ⟨y, rfl⟩
+    dsimp
+    exact sq_nonneg y
+  intro ypos
+  use sqrt y
+  dsimp
+  exact sq_sqrt ypos
 
 end
 
