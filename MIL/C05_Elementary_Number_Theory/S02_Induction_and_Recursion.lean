@@ -49,7 +49,19 @@ theorem dvd_fac {i n : ℕ} (ipos : 0 < i) (ile : i ≤ n) : i ∣ fac n := by
 theorem pow_two_le_fac (n : ℕ) : 2 ^ (n - 1) ≤ fac n := by
   rcases n with _ | n
   · simp [fac]
-  sorry
+  induction' n with n ih
+  · rfl
+  have h₁ : 2 ^ (Nat.succ (Nat.succ n) - 1) = 2 ^ Nat.succ n := by congr
+  have h₂ : 2 ^ Nat.succ n = 2 * 2 ^ (Nat.succ n - 1) := by apply pow_succ
+  have h₃ : 2 ≤ (Nat.succ n + 1) := by
+    apply Nat.pred_le_iff_le_succ.mp
+    simp
+  rw [h₁, h₂]
+  simp [fac]
+  apply mul_le_mul h₃ ih
+  · norm_num
+  norm_num
+
 section
 
 variable {α : Type*} (s : Finset ℕ) (f : ℕ → ℕ) (n : ℕ)
