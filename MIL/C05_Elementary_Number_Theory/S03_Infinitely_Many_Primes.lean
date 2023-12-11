@@ -43,21 +43,38 @@ theorem exists_prime_factor {n : Nat} (h : 2 ≤ n) : ∃ p : Nat, p.Prime ∧ p
     use p, pp
     apply pdvd.trans mdvdn
 
+theorem my_lemma1 (n : ℕ) : 2 ≤ Nat.factorial n + 1 := calc
+  2 = 1 + 1 := by norm_num
+  _ ≤ Nat.factorial n + 1:= by
+    apply Nat.add_le_add_right
+    apply Nat.factorial_pos
+
 theorem primes_infinite : ∀ n, ∃ p > n, Nat.Prime p := by
   intro n
-  have : 2 ≤ Nat.factorial (n + 1) + 1 := by
-    sorry
+  have : 2 ≤ Nat.factorial (n + 1) + 1 := my_lemma1 (n + 1)
   rcases exists_prime_factor this with ⟨p, pp, pdvd⟩
   refine' ⟨p, _, pp⟩
   show p > n
   by_contra ple
   push_neg  at ple
   have : p ∣ Nat.factorial (n + 1) := by
-    sorry
+    apply Nat.dvd_factorial (Nat.Prime.pos pp)
+    apply le_trans ple
+    linarith
   have : p ∣ 1 := by
-    sorry
+    have h₁ : Nat.factorial (n + 1) ≤ Nat.factorial (n + 1) + 1 := by
+      norm_num
+    have h₂ : Nat.factorial (n + 1) + 1 - Nat.factorial (n + 1) = 1 := by
+      norm_num
+    have h₃ : p ∣ Nat.factorial (n + 1) + 1 - Nat.factorial (n + 1) := by
+      apply Nat.dvd_sub h₁ pdvd this
+    rw [h₂] at h₃
+    exact h₃
   show False
-  sorry
+  rw [Nat.dvd_one] at this
+  apply Nat.Prime.ne_one pp
+  exact this
+
 open Finset
 
 section
