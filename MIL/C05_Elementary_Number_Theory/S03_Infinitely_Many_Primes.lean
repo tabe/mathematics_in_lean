@@ -107,9 +107,20 @@ section
 variable {α : Type*} [DecidableEq α] (r s t : Finset α)
 
 example : (r ∪ s) ∩ (r ∪ t) = r ∪ s ∩ t := by
-  sorry
+  ext x
+  constructor
+  · simp [subset_iff]
+    tauto
+  simp [subset_iff]
+  tauto
+
 example : (r \ s) \ t = r \ (s ∪ t) := by
-  sorry
+  ext x
+  constructor
+  · simp [subset_iff]
+    tauto
+  simp [subset_iff]
+  tauto
 
 end
 
@@ -119,7 +130,10 @@ example (s : Finset ℕ) (n : ℕ) (h : n ∈ s) : n ∣ ∏ i in s, i :=
 theorem _root_.Nat.Prime.eq_of_dvd_of_prime {p q : ℕ}
       (prime_p : Nat.Prime p) (prime_q : Nat.Prime q) (h : p ∣ q) :
     p = q := by
-  sorry
+  rcases Nat.Prime.eq_one_or_self_of_dvd prime_q p h with h₁ | h₁
+  · rw [h₁] at prime_p
+    exact absurd prime_p Nat.not_prime_one
+  exact h₁
 
 theorem mem_of_dvd_prod_primes {s : Finset ℕ} {p : ℕ} (prime_p : p.Prime) :
     (∀ n ∈ s, Nat.Prime n) → (p ∣ ∏ n in s, n) → p ∈ s := by
