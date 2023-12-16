@@ -120,8 +120,12 @@ instance instCommRing : CommRing gaussInt where
   mul_comm := by
     intros
     ext <;> simp <;> ring
-  zero_mul := sorry
-  mul_zero := sorry
+  zero_mul := by
+    intro
+    ext <;> simp
+  mul_zero := by
+    intro
+    ext <;> simp
 
 @[simp]
 theorem sub_re (x y : gaussInt) : (x - y).re = x.re - y.re :=
@@ -166,7 +170,6 @@ theorem abs_mod'_le (a b : ℤ) (h : 0 < b) : |mod' a b| ≤ b / 2 := by
   have := Int.emod_lt_of_pos (a + b / 2) h
   have := Int.ediv_add_emod b 2
   have := Int.emod_lt_of_pos b zero_lt_two
-  revert this; intro this -- FIXME, this should not be needed
   linarith
 
 theorem mod'_eq (a b : ℤ) : mod' a b = a - b * div' a b := by linarith [div'_add_mod' a b]
@@ -175,7 +178,28 @@ end Int
 
 theorem sq_add_sq_eq_zero {α : Type*} [LinearOrderedRing α] (x y : α) :
     x ^ 2 + y ^ 2 = 0 ↔ x = 0 ∧ y = 0 := by
-  sorry
+  constructor
+  · intro h
+    have g : x ^ 2 + y ^ 2 ≤ 0 := le_of_eq h
+    have zlex : 0 ≤ x ^ 2 := sq_nonneg x
+    have zley : 0 ≤ y ^ 2 := sq_nonneg y
+    have hx : x ^ 2 ≤ 0 := le_of_add_le_of_nonneg_left g zley
+    have hy : y ^ 2 ≤ 0 := le_of_add_le_of_nonneg_right g zlex
+    constructor
+    · contrapose! hx
+      have : 0 < x ^ 2 := by
+        apply sq_pos_of_ne_zero
+        exact hx
+      exact this
+    contrapose! hy
+    have : 0 < y ^ 2 := by
+      apply sq_pos_of_ne_zero
+      exact hy
+    exact this
+  rintro ⟨hx, hy⟩
+  rw [hx, hy]
+  simp
+
 namespace gaussInt
 
 def norm (x : gaussInt) :=

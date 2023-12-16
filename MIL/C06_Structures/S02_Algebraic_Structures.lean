@@ -12,6 +12,9 @@ structure Group₁ (α : Type*) where
   one_mul : ∀ x : α, mul one x = x
   mul_left_inv : ∀ x : α, mul (inv x) x = one
 
+#check Group
+#print Group
+
 structure Group₁Cat where
   α : Type*
   str : Group₁ α
@@ -55,7 +58,13 @@ def permGroup {α : Type*} : Group₁ (Equiv.Perm α)
 
 structure AddGroup₁ (α : Type*) where
   (add : α → α → α)
-  -- fill in the rest
+  zero : α
+  neg : α → α
+  add_assoc : ∀ x y z : α, add (add x y) z = add x (add y z)
+  add_zero : ∀ x : α, add x zero = x
+  zero_add : ∀ x : α, add zero x = x
+  add_left_neg : ∀ x : α, add (neg x) x = zero
+
 @[ext]
 structure Point where
   x : ℝ
@@ -67,11 +76,32 @@ namespace Point
 def add (a b : Point) : Point :=
   ⟨a.x + b.x, a.y + b.y, a.z + b.z⟩
 
-def neg (a : Point) : Point := sorry
+def neg (a : Point) : Point := ⟨- a.x, - a.y, - a.z⟩
 
-def zero : Point := sorry
+def zero : Point := ⟨0, 0, 0⟩
 
-def addGroupPoint : AddGroup₁ Point := sorry
+theorem my_add_assoc (x y z : Point) : add (add x y) z = add x (add y z) := by
+  rw [add, add]
+  ext <;> dsimp
+  repeat' apply add_assoc
+
+theorem my_add_zero (x : Point) : add x zero = x := by
+  rw [add, zero]
+  ext <;> dsimp
+  repeat' apply add_zero
+
+theorem my_zero_add (x : Point) : add zero x = x := by
+  rw [add, zero]
+  ext <;> dsimp
+  repeat' apply zero_add
+
+theorem my_add_left_neg (x : Point) : add (neg x) x = zero := by
+  rw [add, neg, zero]
+  ext <;> dsimp
+  repeat' rw [neg_add_eq_zero]
+
+def addGroupPoint : AddGroup₁ Point :=
+  ⟨add, zero, neg, my_add_assoc, my_add_zero, my_zero_add, my_add_left_neg⟩
 
 end Point
 
@@ -170,4 +200,18 @@ end
 
 class AddGroup₂ (α : Type*) where
   add : α → α → α
-  -- fill in the rest
+  zero : α
+  neg : α → α
+  add_assoc : ∀ x y z : α, add (add x y) z = add x (add y z)
+  add_zero : ∀ x : α, add x zero = x
+  zero_add : ∀ x : α, add zero x = x
+  add_left_neg : ∀ x : α, add (neg x) x = zero
+
+instance hasAddGroup₂ {α : Type*} [AddGroup₂ α] : Add α :=
+  ⟨AddGroup₂.add⟩
+
+instance hasZeroGroup₂ {α : Type*} [AddGroup₂ α] : Zero α :=
+  ⟨AddGroup₂.zero⟩
+
+instance hasNegGroup₂ {α : Type*} [AddGroup₂ α] : Neg α :=
+  ⟨AddGroup₂.neg⟩
