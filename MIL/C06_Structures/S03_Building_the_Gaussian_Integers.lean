@@ -207,13 +207,39 @@ def norm (x : gaussInt) :=
 
 @[simp]
 theorem norm_nonneg (x : gaussInt) : 0 ≤ norm x := by
-  sorry
+  rw [norm]; calc
+  0 = 0 + 0 := by norm_num
+  _ ≤ x.re ^ 2 + x.im ^ 2 := add_le_add (sq_nonneg x.re) (sq_nonneg x.im)
+
 theorem norm_eq_zero (x : gaussInt) : norm x = 0 ↔ x = 0 := by
-  sorry
+  constructor
+  · intro h
+    rw [norm] at h
+    have : x.re = 0 ∧ x.im = 0 := by
+      apply (sq_add_sq_eq_zero x.re x.im).mp
+      exact h
+    ext
+    · rw [zero_re]; exact this.left
+    rw [zero_im]; exact this.right
+  intro h
+  rw [h, norm, zero_re, zero_im]
+  linarith
+
 theorem norm_pos (x : gaussInt) : 0 < norm x ↔ x ≠ 0 := by
-  sorry
+  constructor
+  · intro h
+    contrapose! h
+    rw [← norm_eq_zero x] at h
+    linarith
+  intro h
+  contrapose! h
+  rw [← norm_eq_zero x]
+  exact le_antisymm h (norm_nonneg x)
+
 theorem norm_mul (x y : gaussInt) : norm (x * y) = norm x * norm y := by
+  rw [norm, norm, norm]
   sorry
+
 def conj (x : gaussInt) : gaussInt :=
   ⟨x.re, -x.im⟩
 
