@@ -237,8 +237,8 @@ theorem norm_pos (x : gaussInt) : 0 < norm x ↔ x ≠ 0 := by
   exact le_antisymm h (norm_nonneg x)
 
 theorem norm_mul (x y : gaussInt) : norm (x * y) = norm x * norm y := by
-  rw [norm, norm, norm]
-  sorry
+  rw [norm, mul_re, mul_im, norm, norm]
+  linarith
 
 def conj (x : gaussInt) : gaussInt :=
   ⟨x.re, -x.im⟩
