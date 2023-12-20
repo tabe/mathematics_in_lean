@@ -155,7 +155,7 @@ example (h : ∀ x y z : α, x ⊓ (y ⊔ z) = x ⊓ y ⊔ x ⊓ z) : a ⊔ b �
     · rw [inf_comm, h]
       apply my_le_le_sup_sup
       · exact inf_le_right
-      · exact le_rfl
+      · rw [inf_comm]
 
 example (h : ∀ x y z : α, x ⊔ y ⊓ z = (x ⊔ y) ⊓ (x ⊔ z)) : a ⊓ (b ⊔ c) = a ⊓ b ⊔ a ⊓ c := by
   have h1 : (a ⊓ b) ⊔ a = a := by

@@ -96,7 +96,7 @@ class Inv₁ (α : Type) where
 @[inherit_doc]
 postfix:max "⁻¹" => Inv₁.inv
 
-class Group₁ (G : Type) extends Monoid₁ G, Inv G where
+class Group₁ (G : Type) extends Monoid₁ G, Inv₁ G where
   inv_dia : ∀ a : G, a⁻¹ ⋄ a = 𝟙
 
 
@@ -113,8 +113,8 @@ example {M : Type} [Monoid₁ M] {a b c : M} (hba : b ⋄ a = 𝟙) (hac : a ⋄
   rw [← one_dia c, ← hba, dia_assoc, hac, dia_one b]
 
 
-lemma inv_eq_of_dia [Group₁ G] {a b : G} (h : a ⋄ b = 𝟙) : a⁻¹ = b :=
-  sorry
+lemma inv_eq_of_dia [Group₁ G] {a b : G} (h : a ⋄ b = 𝟙) : a⁻¹ = b := by
+  rw [← dia_one a⁻¹, ← h, ← dia_assoc, inv_dia a, one_dia b]
 
 lemma dia_inv [Group₁ G] (a : G) : a ⋄ a⁻¹ = 𝟙 :=
   sorry
