@@ -116,11 +116,11 @@ example {M : Type} [Monoid₁ M] {a b c : M} (hba : b ⋄ a = 𝟙) (hac : a ⋄
 lemma inv_eq_of_dia [Group₁ G] {a b : G} (h : a ⋄ b = 𝟙) : a⁻¹ = b := by
   rw [← dia_one a⁻¹, ← h, ← dia_assoc, inv_dia a, one_dia b]
 
-lemma dia_inv [Group₁ G] (a : G) : a ⋄ a⁻¹ = 𝟙 :=
-  sorry
+lemma my_inv_inv [Group₁ G] (a : G) : (a⁻¹)⁻¹ = a := left_inv_eq_right_inv₁ (inv_dia a⁻¹) (inv_dia a)
 
-
-
+lemma dia_inv [Group₁ G] (a : G) : a ⋄ a⁻¹ = 𝟙 := calc
+  a ⋄ a⁻¹ = (a⁻¹)⁻¹ ⋄ a⁻¹ := by nth_rw 1 [← my_inv_inv a]
+  _ = 𝟙 := inv_dia a⁻¹
 
 class AddSemigroup₃ (α : Type) extends Add α where
 /-- Addition is associative -/
@@ -173,21 +173,35 @@ attribute [simp] Group₃.inv_mul AddGroup₃.neg_add
 
 
 @[to_additive]
-lemma inv_eq_of_mul [Group₃ G] {a b : G} (h : a * b = 1) : a⁻¹ = b :=
-  sorry
+lemma inv_eq_of_mul [Group₃ G] {a b : G} (h : a * b = 1) : a⁻¹ = b := by
+  rw [← mul_one a⁻¹, ← h, ← mul_assoc₃, Group₃.inv_mul a, one_mul b]
 
 
 @[to_additive (attr := simp)]
 lemma Group₃.mul_inv {G : Type} [Group₃ G] {a : G} : a * a⁻¹ = 1 := by
-  sorry
+  have : a⁻¹⁻¹ = a := left_inv_eq_right_inv' (Group₃.inv_mul a⁻¹) (Group₃.inv_mul a)
+  nth_rw 1 [← this]
+  exact Group₃.inv_mul a⁻¹
 
 @[to_additive]
-lemma mul_left_cancel₃ {G : Type} [Group₃ G] {a b c : G} (h : a * b = a * c) : b = c := by
-  sorry
+lemma mul_left_cancel₃ {G : Type} [Group₃ G] {a b c : G} (h : a * b = a * c) : b = c := calc
+  b = 1 * b := by rw [one_mul b]
+  _ = a⁻¹ * a * b := by rw [← Group₃.inv_mul a]
+  _ = a⁻¹ * (a * b) := by rw [mul_assoc₃]
+  _ = a⁻¹ * (a * c) := by rw [h]
+  _ = a⁻¹ * a * c := by rw [← mul_assoc₃]
+  _ = 1 * c := by rw [Group₃.inv_mul a]
+  _ = c := by rw [one_mul c]
 
 @[to_additive]
-lemma mul_right_cancel₃ {G : Type} [Group₃ G] {a b c : G} (h : b*a = c*a) : b = c := by
-  sorry
+lemma mul_right_cancel₃ {G : Type} [Group₃ G] {a b c : G} (h : b*a = c*a) : b = c := calc
+  b = b * 1 := by rw [mul_one b]
+  _ = b * (a * a⁻¹) := by rw [← Group₃.mul_inv]
+  _ = b * a * a⁻¹ := by rw [← mul_assoc₃]
+  _ = c * a * a⁻¹ := by rw [h]
+  _ = c * (a * a⁻¹) := by rw [mul_assoc₃]
+  _ = c * 1 := by rw [Group₃.mul_inv]
+  _ = c := by rw [mul_one c]
 
 class AddCommGroup₃ (G : Type) extends AddGroup₃ G, AddCommMonoid₃ G
 
